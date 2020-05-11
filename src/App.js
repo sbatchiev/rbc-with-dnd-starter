@@ -1,7 +1,11 @@
 import React, { Component } from "react";
-import { Calendar, momentLocalizer } from "react-big-calendar";
+import { Calendar, momentLocalizer, Views } from "react-big-calendar";
 import moment from "moment";
+import events from './events'
 import withDragAndDrop from "react-big-calendar/lib/addons/dragAndDrop";
+import Modal from '@material-ui/core/Modal';
+import Box from '@material-ui/core/Box';
+import FaceIcon from '@material-ui/icons/Face';
 
 import "./App.css";
 import "react-big-calendar/lib/addons/dragAndDrop/styles.css";
@@ -11,6 +15,7 @@ const localizer = momentLocalizer(moment);
 const DnDCalendar = withDragAndDrop(Calendar);
 
 class App extends Component {
+
   state = {
     events: [
       {
@@ -22,6 +27,40 @@ class App extends Component {
       }
     ]
   };
+
+  // constructor(...args) {
+  //   super(...args)
+
+  //   this.state = { events }
+  // }
+
+  handleSelect = ({ start, end, slots }) => {
+    const title = window.prompt('New Event name')
+    console.log(slots);
+    console.log(moment(start, "DD-MM-YYYY"));
+    console.log(moment(start, "DD-MM-YYYY").add(1, 'days'));
+    if (title) {
+      let slotEvents = slots.map(slot => {
+        return {
+          start: slot,
+          end: slot,
+          title
+        }
+      })
+      this.setState({
+        events: [
+          ...this.state.events,
+          ...slotEvents
+          // {
+          //   start,
+          //   end,
+          //   title,
+          // },
+          
+        ],
+      })
+    }
+  }
 
   onEventResize = (type, { event, start, end, allDay }) => {
     this.setState(state => {
@@ -38,15 +77,15 @@ class App extends Component {
   render() {
     return (
       <div className="App">
-        <DnDCalendar
-          defaultDate={moment().toDate()}
-          defaultView="month"
-          events={this.state.events}
+        <Calendar
+          selectable
           localizer={localizer}
-          onEventDrop={this.onEventDrop}
-          onEventResize={this.onEventResize}
-          resizable
-          style={{ height: "100vh" }}
+          events={this.state.events}
+          defaultView={Views.MONTH}
+          // scrollToTime={new Date(1970, 1, 1, 6)}
+          // defaultDate={new Date(2015, 3, 12)}
+          onSelectEvent={event => alert(event.title)}
+          onSelectSlot={this.handleSelect}
         />
       </div>
     );
